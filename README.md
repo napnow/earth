@@ -81,4 +81,4 @@ python -m http.server 8899
 
 ## License
 
-MIT（继承原作）。原作灵感致谢：[changing-worlds](https://changing-worlds.vercel.app/) · [Three.js](https://threejs.org/)
+MIT（继承原作）。原作灵感致谢：X 平台 [@kevin_t_ngo](https://x.com/kevin_t_ngo) · [Three.js](https://threejs.org/)
