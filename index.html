@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Circling</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="A world that keeps becoming a different world. A single animated 3D artwork, on a cathode ray tube.">
+<meta name="theme-color" content="#04050b">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27><rect width=%2732%27 height=%2732%27 fill=%27%2302030a%27/><circle cx=%2716%27 cy=%2716%27 r=%2710%27 fill=%27%233f8f72%27/><path d=%27M8 12q6 3 11-1%27 stroke=%27%231e7a72%27 stroke-width=%273%27 fill=%27none%27/><circle cx=%2724%27 cy=%277%27 r=%271.4%27 fill=%27%23dfe8ff%27/></svg>">
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #04050b;
+    overflow: hidden;
+    /* Nothing here is selectable; the piece is meant to be looked at. */
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #frame {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+  }
+  /* The artwork is 1:1 — a square canvas, letterboxed by the page. */
+  #stage {
+    display: block;
+    width: min(100vw, 100vh);
+    height: min(100vw, 100vh);
+    touch-action: none;
+  }
+  /* Fades off once the first frames have rendered. */
+  #curtain {
+    position: fixed;
+    inset: 0;
+    background: #04050b;
+    pointer-events: none;
+    transition: opacity 1.6s ease-out;
+  }
+  #curtain.lifted { opacity: 0; }
+  /* The plaque: a typed label for the current world. */
+  #plaque {
+    position: fixed;
+    /* 锚定到 letterbox 后的画布左下角 */
+    left: calc((100vw - min(100vw, 100vh)) / 2 + 24px);
+    bottom: max(calc((100vh - min(100vw, 100vh)) / 2 - 64px), 20px);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    pointer-events: none;
+    z-index: 25;
+    opacity: 0;
+    transition: opacity 1s ease 0.4s;
+  }
+  #plaque.show { opacity: 1; }
+  #plaque .plq-num { font-size: 10px; letter-spacing: 3px; color: #5f6b66; }
+  #plaque .plq-name { font-size: 13px; letter-spacing: 2px; color: #c8d4cc; min-height: 16px; text-shadow: 0 0 8px rgba(200,212,204,.35); }
+  #plaque .plq-name::after { content: "▌"; color: #f0c15f; animation: plq-blink 1s steps(1) infinite; margin-left: 1px; }
+  #plaque.typed .plq-name::after { content: ""; animation: none; }
+  #plaque .plq-life { font-size: 9px; letter-spacing: 2.5px; color: #80caa0; opacity: 0; transition: opacity .8s ease; display: flex; align-items: center; gap: 6px; }
+  #plaque .plq-life.on { opacity: .85; }
+  #plaque .plq-life i { width: 5px; height: 5px; border-radius: 50%; background: #80caa0; box-shadow: 0 0 6px rgba(128,202,160,.8); animation: plq-blink 2.2s ease-in-out infinite; }
+  @keyframes plq-blink { 50% { opacity: 0; } }
+</style>
+</head>
+<body>
+<div id="frame"><canvas id="stage"></canvas></div>
+<div id="curtain"></div>
+<div id="plaque" aria-live="polite">
+  <span class="plq-num"></span>
+  <span class="plq-name"></span>
+  <span class="plq-life"></span>
+</div>
+<script>
+  // The plaque: a small typed label for each world, bottom-left.
+  (() => {
+    const el = document.getElementById('plaque');
+    const num = el.querySelector('.plq-num');
+    const name = el.querySelector('.plq-name');
+    const life = el.querySelector('.plq-life');
+    let timer = null;
+    window.__plaque = function (index, worldName, inhabited) {
+      clearTimeout(timer);
+      num.textContent = `WORLD ${String(index).padStart(3, '0')}`;
+      name.textContent = '';
+      life.textContent = '';
+      const text = worldName.toUpperCase();
+      let i = 0;
+      const tick = () => {
+        i++;
+        name.textContent = text.slice(0, i);
+        if (i < text.length) timer = setTimeout(tick, 34);
+        else if (inhabited) {
+          life.innerHTML = '<i></i> INHABITED';
+          life.classList.add('on');
+          timer = setTimeout(() => { life.classList.remove('on'); }, 6000);
+        }
+      };
+      timer = setTimeout(tick, 350);
+    };
+  })();
+</script>
+<script type="importmap">
+  { "imports": { "three": "./vendor/three/three.module.min.js" } }
+</script>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

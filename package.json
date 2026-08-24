@@ -1,0 +1,10 @@
+{
+  "name": "the-circling",
+  "version": "1.0.0",
+  "description": "A world that keeps becoming a different world. A single animated 3D artwork, on a cathode ray tube.",
+  "type": "module",
+  "scripts": {
+    "start": "python -m http.server 8899"
+  },
+  "license": "MIT"
+}
